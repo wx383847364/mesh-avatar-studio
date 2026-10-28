@@ -16,13 +16,15 @@ const base = '/mesh-avatar-studio/';
 const avatarFile = 'miko.mavatar';
 const publishedUrl = `https://shinshin86.github.io${base}`;
 
+/** 分享图与中文默认站点或日语入口保持一致。 */
 function socialImage(): Plugin {
   return {
     name: 'site-social-image',
     transformIndexHtml: {
       order: 'post',
+      /** 开发预览和构建使用同一语言的正式截图。 */
       handler(html, context) {
-        const language = context.filename === fromHere('./ja/index.html') ? 'ja' : 'en';
+        const language = context.filename === fromHere('./ja/index.html') ? 'ja' : 'zh';
         const screenshot = `docs/images/${language}/01-overview.png`;
         // Vite can prepend the base to the placeholder on the root development page.
         const setImage = (url: string) => html.replace(/content="[^"]*__SOCIAL_IMAGE__"/, () => `content="${url}"`);

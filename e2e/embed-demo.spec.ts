@@ -25,10 +25,12 @@ test.beforeEach(async ({ context, page }) => {
 });
 test.afterEach(({ page }) => { expect(outside.get(page) ?? []).toEqual([]); });
 
+/** 检查口型风格本地化，同时验证各语言下参数与运行效果一致。 */
 async function checkMouthStyles(page: Page, language = 'en') {
-  const selector = page.getByRole('combobox', { name: language === 'ja' ? '口の動きのタイプ' : 'Mouth style', exact: true });
+  const selector = page.getByRole('combobox', { name: language === 'zh' ? '口型动作风格' : language === 'ja' ? '口の動きのタイプ' : 'Mouth style', exact: true });
   await expect(selector).toHaveValue('default');
-  await expect(selector.locator('option:not([disabled])')).toHaveText(language === 'ja'
+  await expect(selector.locator('option:not([disabled])')).toHaveText(language === 'zh'
+    ? ['舒缓', '标准', '轻快', '含蓄', '鲜明'] : language === 'ja'
     ? ['ゆったり', '標準', 'キビキビ', '控えめ', 'はっきり']
     : ['Relaxed', 'Standard', 'Snappy', 'Subtle', 'Expressive']);
   expect(await page.evaluate(() => document.querySelector('mesh-avatar')!.lipSync)).toEqual({});
@@ -57,13 +59,33 @@ async function checkMouthStyles(page: Page, language = 'en') {
   }
 }
 
-for (const language of ['en', 'ja']) {
+// 中文介绍页必须加载本地化截图，并能通过真实链接进入中文播放器。
+test('Chinese landing page loads its screenshots and opens the Chinese player', async ({ page }) => {
+  await page.goto(site);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
+  await expect(page).toHaveTitle('网格虚拟形象工作室 — 让你的插画动起来');
+  await expect(page.locator('#avatar')).toHaveAttribute('data-state', 'ready');
+  await page.getByRole('button', { name: '微笑', exact: true }).click();
+  await expect(page.locator('[data-expression="smile"]')).toHaveAttribute('aria-pressed', 'true');
+  for (const image of await page.locator('img[data-screenshot]').all()) {
+    await expect(image).toHaveAttribute('src', /\/docs\/images\/zh\//);
+    await image.scrollIntoViewIfNeeded();
+    // 图片须实际解码成功，避免只更新文案却留下损坏的截图引用。
+    await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).complete && (node as HTMLImageElement).naturalWidth > 0)).toBe(true);
+  }
+  await page.getByRole('link', { name: '在浏览器中试用', exact: true }).click();
+  await expect(page.getByTestId('player-status')).toContainText('虚拟形象已就绪');
+  await expect(page.getByRole('button', { name: '启动摄像头', exact: true })).toBeVisible();
+});
+
+for (const language of ['zh', 'ja']) {
+  // 检查中文或日语页面的表情、嘴型、导入与恢复示例完整流程。
   test(`embed demo works in ${language} without outside requests`, async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`${site}${language === 'ja' ? 'ja/' : ''}embed/`);
     await expect(page.locator('#status')).toHaveAttribute('data-state', 'ready');
-    await expect(page.locator('html')).toHaveAttribute('lang', language);
+    await expect(page.locator('html')).toHaveAttribute('lang', language === 'zh' ? 'zh-CN' : language);
     await checkMouthStyles(page, language);
     await expect(page.locator('#mouth-style-code')).toContainText('el.setLipSync({ granularity: 0.5, openness: 1, closeSpeed: 0.5 });');
     const image = PNG.sync.read(await page.locator('mesh-avatar canvas').screenshot({ omitBackground: true }));
@@ -97,7 +119,7 @@ for (const language of ['en', 'ja']) {
     await expect(page.locator('#file-code')).toHaveText('<mesh-avatar src="/path/to/your-avatar.mavatar"></mesh-avatar>');
     expect(await page.evaluate(() => document.querySelector('mesh-avatar')!.avatar !== Reflect.get(window, 'previousAvatar'))).toBe(true);
     await page.locator('#restore-miko').click();
-    await expect(page.locator('#source-name')).toHaveText('Miko');
+    await expect(page.locator('#source-name')).toHaveText(language === 'zh' ? '米可' : 'Miko');
     await expect(page.locator('#file-code')).toHaveText('<mesh-avatar></mesh-avatar>');
     await expect(page.locator('#status')).toHaveAttribute('data-state', 'ready');
 

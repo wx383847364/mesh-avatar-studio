@@ -13,8 +13,9 @@ import { Icon } from '../editor/Icon';
 import { createLiveSender, receiveExpression, receiveLightingPreset, sendLighting, sendOverlays, watchDuplicateLivePages } from './relay';
 import { EXPRESSION_TOKEN_PATH, LIGHTING_PRESET_PATH } from './expression-protocol';
 
+/** 展示本地直播控制，使用当前界面语言呈现状态与操作。 */
 export function LiveApp() {
-  const { language, setLanguage } = useI18n(), t = liveText[language];
+  const { language, setLanguage, t: ui } = useI18n(), t = liveText[language];
   const [settings, setSettings] = useState(() => { const view = viewSettings(location.search); return { ...view, lighting: view.lighting ?? loadLighting(view.project), overlays: view.overlays ?? loadOverlays(view.project) }; });
   // Overlay layers the loaded avatar has (built/overlays), listed once it has loaded.
   const [availableOverlays, setAvailableOverlays] = useState<string[]>([]);
@@ -135,8 +136,9 @@ export function LiveApp() {
   const url = streamUrl(settings, location.origin);
   const status = cameraState === 'running' ? tracking ? 'tracking' : 'lost' : cameraState;
   return <main className="live-app">
-    <header className="live-header"><div><a href="/">{t.back}</a><h1>Mesh Avatar Studio <span>{t.title}</span></h1></div>
-      <div className="live-languages">{(['en', 'ja', 'zh'] as const).map(lang => <button key={lang} aria-pressed={language === lang} onClick={() => setLanguage(lang)}>{({ en: 'English', ja: '日本語', zh: '简体中文' })[lang]}</button>)}</div>
+    <header className="live-header"><div><a href="/">{t.back}</a><h1>{ui.product} <span>{t.title}</span></h1></div>
+      {/* 语言按钮名称沿用当前词典，中文界面不混用英文按钮说明。 */}
+      <div className="live-languages">{(['en', 'ja', 'zh'] as const).map(lang => <button key={lang} aria-pressed={language === lang} onClick={() => setLanguage(lang)}>{({ en: ui.english, ja: ui.japanese, zh: ui.chinese })[lang]}</button>)}</div>
     </header>
     <div className="live-layout"><section className="live-view"><div className="live-preview checkerboard lighting-preview" style={{ backgroundColor: settings.background, backgroundImage: settings.background === 'transparent' ? undefined : 'none' }}>
       <canvas ref={canvas} data-testid="live-avatar" />
@@ -186,13 +188,13 @@ export function LiveApp() {
         <a href="https://github.com/shinshin86/mesh-avatar-studio/blob/main/docs/reference.md#switching-expressions-from-other-apps" target="_blank" rel="noreferrer">{t.remoteDocs}</a></div>
       </details>
       {availableOverlays.length > 0 && <details className="live-overlays" data-testid="overlay-section" open>
-        <summary><Icon name="eye" />{t.overlays}{settings.overlays.some(name => availableOverlays.includes(name)) && <span className="overlays-on">ON</span>}</summary>
+        <summary><Icon name="eye" />{t.overlays}{settings.overlays.some(name => availableOverlays.includes(name)) && <span className="overlays-on">{language === 'zh' ? '已开启' : 'ON'}</span>}</summary>
         <div className="overlay-buttons" role="group" aria-label={t.overlays}>
           {availableOverlays.map(name => <button key={name} type="button" aria-pressed={settings.overlays.includes(name)} onClick={() => toggleOverlay(name)}>{name}</button>)}
         </div><small>{t.overlaysHint}</small>
       </details>}
       <details className="live-lighting" data-testid="lighting-section" onToggle={event => setLightingOpen(event.currentTarget.open)}>
-        <summary><Icon name="light" />{lightingText[language].title}{settings.lighting.enabled && <span className="lighting-on">ON</span>}</summary>
+        <summary><Icon name="light" />{lightingText[language].title}{settings.lighting.enabled && <span className="lighting-on">{language === 'zh' ? '已开启' : 'ON'}</span>}</summary>
         <div className="lighting-presets"><h3>{t.presets}</h3>
           <div className="preset-slots" role="group" aria-label={t.presets}>
             {presets.map((value, i) => <div className="preset-slot" key={i}>

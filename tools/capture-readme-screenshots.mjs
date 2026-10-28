@@ -97,11 +97,13 @@ async function closeCards(page) {
   await page.getByTestId('variants-panel').evaluate(element => { element.open = false; });
   await page.locator('.right-column').evaluate(element => { element.scrollTop = 0; });
 }
+/** 按语言准备示例的编辑器和直播画面，不修改正式示例。 */
 async function prepare(page, language, scene) {
+  const zh = language === 'zh';
   const ja = language === 'ja';
   if (scene === '07-live') {
     await page.goto(new URL(`/live.html?project=${sampleId}`, server.resolvedUrls.local[0]).href);
-    await expect(page.getByRole('status').first()).toContainText(ja ? 'アバターの準備完了' : 'Avatar ready');
+    await expect(page.getByRole('status').first()).toContainText(zh ? '形象已就绪' : ja ? 'アバターの準備完了' : 'Avatar ready');
     // The real URL contains this run's random port; show the usual dev-server address instead.
     await page.locator('.obs-url').evaluate((input, value) => { input.value = value; }, `http://127.0.0.1:5173/stream.html?project=${sampleId}&bg=transparent&fit=contain&idle=1`);
     return;
@@ -117,58 +119,61 @@ async function prepare(page, language, scene) {
     for (const path of ['source.png', 'built/base.png']) await page.route(`**/miko-qipao/${path}`, route => route.fulfill({ status: 404, body: '' }));
     await page.goto(server.resolvedUrls.local[0]);
     await expect(page.getByTestId('ask-agent-new')).toBeVisible();
-    await expect(page.getByRole('heading', { name: ja ? 'プロジェクトを開く' : 'Open a project', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: zh ? '打开一个项目' : ja ? 'プロジェクトを開く' : 'Open a project', exact: true })).toBeVisible();
     return;
   }
   await open(page, scene === '04-rebuild' ? 'miko-editing' : scene === '05-variants' ? 'miko-variants' : sampleId);
   await closeCards(page);
   if (scene === '02-edit-handles') {
     await page.getByTestId('part-eyes').click();
-    await page.getByRole('button', { name: ja ? '選択中のパーツに合わせる' : 'Fit selected part', exact: true }).click();
+    await page.getByRole('button', { name: zh ? '定位选中部件' : ja ? '選択中のパーツに合わせる' : 'Fit selected part', exact: true }).click();
     await expect(page.getByTestId('editor')).toHaveAttribute('data-focus-group', 'eyes');
   } else if (scene === '03-lip-sync') {
-    await page.getByRole('tab', { name: ja ? '口の動き' : 'Lip sync', exact: true }).click();
-    const style = page.getByTestId('audio-lip-settings').getByRole('button', { name: ja ? 'はっきり' : 'Expressive', exact: true });
+    await page.getByRole('tab', { name: zh ? '嘴型测试' : ja ? '口の動き' : 'Lip sync', exact: true }).click();
+    const style = page.getByTestId('audio-lip-settings').getByRole('button', { name: zh ? '鲜明' : ja ? 'はっきり' : 'Expressive', exact: true });
     await style.click();
     await expect(style).toHaveAttribute('aria-pressed', 'true');
     await page.getByRole('button', { name: 'あ', exact: true }).click();
     await expect(page.getByRole('button', { name: 'あ', exact: true })).toHaveAttribute('aria-pressed', 'true');
-    await expect.poll(async () => Number(await page.getByRole('slider', { name: ja ? '口の開き' : 'Mouth open', exact: true }).inputValue())).toBeGreaterThan(0.98);
+    // 使用当前语言定位嘴型滑块，等待实际姿态达到截图要求。
+    await expect.poll(async () => Number(await page.getByRole('slider', { name: zh ? '嘴巴开合' : ja ? '口の開き' : 'Mouth open', exact: true }).inputValue())).toBeGreaterThan(0.98);
     await page.locator('#lip-panel').evaluate(element => { element.scrollTop = 0; });
     await expect(page.locator('.lip-text-row')).toBeInViewport();
     await expect(style).toBeInViewport();
   } else if (scene === '04-rebuild') {
     await page.getByTestId('part-eyes').click();
-    await page.locator('summary').filter({ hasText: ja ? /^1 · 開口部 \(\d+\)$/ : /^1 · Opening \(\d+\)$/ }).click();
+    await page.locator('summary').filter({ hasText: zh ? /^1 · 眼睛开口轮廓 \(\d+\)$/ : ja ? /^1 · 開口部 \(\d+\)$/ : /^1 · Opening \(\d+\)$/ }).click();
     await page.getByRole('spinbutton', { name: 'eyes.0.opening.0.0', exact: true }).fill('451');
-    await page.getByRole('button', { name: ja ? '選択中のパーツに合わせる' : 'Fit selected part', exact: true }).click();
+    await page.getByRole('button', { name: zh ? '定位选中部件' : ja ? '選択中のパーツに合わせる' : 'Fit selected part', exact: true }).click();
     await expect(page.getByTestId('editor')).toHaveAttribute('data-focus-group', 'eyes');
-    await expect(page.getByTestId('stale-banner').locator('small')).toHaveText(ja ? '変更されたパーツ: 目' : 'Changed parts: Eyes');
-    await expect(page.getByRole('button', { name: ja ? '保存してレイヤーを作り直す' : 'Save and rebuild layers', exact: true })).toBeVisible();
+    await expect(page.getByTestId('stale-banner').locator('small')).toHaveText(zh ? '已修改的部件: 眼睛' : ja ? '変更されたパーツ: 目' : 'Changed parts: Eyes');
+    await expect(page.getByRole('button', { name: zh ? '保存并重建图层' : ja ? '保存してレイヤーを作り直す' : 'Save and rebuild layers', exact: true })).toBeVisible();
     await expect(page.getByTestId('preview-status')).toHaveAttribute('data-state', 'ready');
   } else if (scene === '05-variants') {
     const panel = page.getByTestId('variants-panel');
     await panel.evaluate(element => { element.open = true; });
-    await panel.getByRole('checkbox', { name: ja ? '口' : 'Mouth', exact: true }).check();
+    await panel.getByRole('checkbox', { name: zh ? '嘴型' : ja ? '口' : 'Mouth', exact: true }).check();
     const card = page.getByTestId('ask-agent-variants');
     await card.getByRole('button', { name: 'Codex', exact: true }).click();
     await expect(card.getByRole('button', { name: 'Codex', exact: true })).toHaveAttribute('aria-pressed', 'true');
-    await expect(panel.locator('.variant-count').last()).toHaveText(ja ? 'なし' : 'Missing');
+    await expect(panel.locator('.variant-count').last()).toHaveText(zh ? '暂无' : ja ? 'なし' : 'Missing');
     await page.locator('.right-column').evaluate(element => { element.scrollTop += element.querySelector('.variants-panel').getBoundingClientRect().top - element.getBoundingClientRect().top; });
-    await expect(card.getByRole('button', { name: ja ? '依頼文をコピー' : 'Copy message', exact: true })).toBeInViewport();
+    await expect(card.getByRole('button', { name: zh ? '复制请求' : ja ? '依頼文をコピー' : 'Copy message', exact: true })).toBeInViewport();
     return;
   }
   await page.locator('.right-column').evaluate(element => { element.scrollTop = 0; });
 }
+/** 使用隔离浏览器采集对应语言，完成后释放浏览器上下文。 */
 async function capture(language, scene) {
-  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, locale: language === 'ja' ? 'ja-JP' : 'en-US', timezoneId: 'UTC' });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, locale: language === 'zh' ? 'zh-CN' : language === 'ja' ? 'ja-JP' : 'en-US', timezoneId: 'UTC' });
   try {
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
+    // 每张截图独立设置语言和引导状态，不读取用户真实偏好。
     await page.addInitScript(language => {
       localStorage.clear();
-      localStorage.setItem('mesh-avatar-language', language);
+      localStorage.setItem('mesh-avatar-studio-language', language);
       localStorage.setItem('mesh-avatar-guide-seen', '1');
       localStorage.setItem('mesh-avatar-reopen-project', '0');
       localStorage.setItem('mesh-avatar-agent-recipient', 'codex');
@@ -197,12 +202,14 @@ try {
   await mkdir(join(root, 'projects'), { recursive: true });
   await sampleCopy('miko-editing', true);
   await sampleCopy('miko-variants', false);
-  server = await createServer({ root, plugins: [captureApi()], server: { host: '127.0.0.1', port: 0, strictPort: true, open: false } });
+  server = await createServer({ root, plugins: [captureApi()], server: { host: '127.0.0.1', port: 0, strictPort: false, open: false } });
   await server.listen();
   browser = await chromium.launch();
   const images = [];
   const scenes = ['01-overview', '02-edit-handles', '03-lip-sync', '04-rebuild', '05-variants', '06-new-project', '07-live', '08-stream'];
-  for (const language of ['en', 'ja']) for (const scene of scenes) {
+  // 允许只更新中文截图，保留已有英文和日文图片。
+  const languages = process.argv.includes('--zh') ? ['zh'] : ['en', 'ja'];
+  for (const language of languages) for (const scene of scenes) {
     images.push(await capture(language, scene));
     console.log(`Captured ${language}/${scene}.png`);
   }
@@ -210,7 +217,7 @@ try {
     await mkdir(join(output, language), { recursive: true });
     await writeFile(join(output, language, `${scene}.png`), png);
   }
-  console.log(`Saved ${images.length} screenshots to docs/images/{en,ja}/ (1440×900, PNG without metadata).`);
+  console.log(`Saved ${images.length} screenshots to docs/images/ 对应语言目录 (1440×900, PNG without metadata).`);
 } catch (error) {
   console.error(`screenshots: ${error.message.replaceAll(root, '<repo>/').replaceAll(homedir(), '~')}`);
   process.exitCode = 1;

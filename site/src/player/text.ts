@@ -1,4 +1,4 @@
-export type PlayerLanguage = 'en' | 'ja';
+export type PlayerLanguage = 'en' | 'ja' | 'zh';
 
 const en = {
   title: 'Player',
@@ -40,7 +40,7 @@ const en = {
 const ja: typeof en = {
   title: 'Player',
   home: 'Mesh Avatar Studio のトップへ',
-  otherLanguage: 'English',
+  otherLanguage: '简体中文',
   intro: 'メッシュアバターを、顔と声でこのブラウザ上ですぐに動かせます。インストールは不要です。',
   avatar: 'アバター',
   sample: 'ミコ(サンプル)',
@@ -74,4 +74,26 @@ const ja: typeof en = {
   expressionHint: 'この画面かアバターウィンドウを操作している間は、キー1〜8で表情を切り替えられます。通常に戻すときはキー1を押します。',
 };
 
-export const playerText = { en, ja };
+const zh: typeof en = {
+  title: '播放器', home: '网格虚拟形象工作室首页', otherLanguage: '日语',
+  intro: '直接在浏览器中用面部和声音驱动网格虚拟形象，无需安装。',
+  avatar: '虚拟形象', sample: '米可（示例）', open: '打开 .mavatar 文件', useSample: '使用示例',
+  dropHint: '也可以将 .mavatar 文件拖到页面任意位置。', makeOwn: '使用网格虚拟形象工作室制作自己的角色',
+  loading: '正在加载虚拟形象…', ready: '虚拟形象已就绪',
+  loadError: '无法打开此文件，请选择从网格虚拟形象工作室导出的 .mavatar 文件。', tooLarge: '文件超过 128 MiB。',
+  dropHere: '松开鼠标，打开 .mavatar 文件', background: '背景', none: '无背景（仅预览）',
+  bgHintNone: '窗口采集无法保留透明背景，在 OBS 中请使用绿色或蓝色。',
+  bgHintChroma: '在 OBS 中为采集来源添加“色度键”滤镜，并选择相同的颜色。',
+  bgHintCustom: '在 OBS 中为采集来源添加“色值键”滤镜，并选择此颜色。',
+  show: '在 OBS 中显示', showHelp: '将虚拟形象在独立窗口中打开，再在 OBS 中添加“窗口采集”（macOS 使用“macOS 屏幕采集”的窗口模式）。',
+  popOut: '打开虚拟形象窗口', popIn: '关闭虚拟形象窗口', popped: '虚拟形象已在独立窗口中显示。',
+  popOutUnsupported: '独立形象窗口需要 Chrome 或 Edge，也可以使用“此窗口仅显示虚拟形象”。',
+  fullWindow: '此窗口仅显示虚拟形象', exitFullWindow: '按 Esc 或点击画面恢复控制面板。',
+  keepVisible: '请保持虚拟形象窗口可见，窗口最小化或被完全遮挡时，浏览器会暂停绘制。',
+  privacy: '全部处理均在此浏览器内完成，虚拟形象文件、摄像头画面和麦克风音频不会上传。',
+  credit: '米可 © Yuki Shindo（AITuber OnAir）。', terms: '使用规范',
+  presetHint: '点击“保存”将当前光照存入对应栏位。在此页面或形象窗口操作时，可按 Shift+1–8 切换预设。',
+  expressionHint: '在此页面或形象窗口操作时，可按 1–8 切换表情，按 1 恢复普通表情。',
+};
+
+export const playerText = { en, ja, zh };

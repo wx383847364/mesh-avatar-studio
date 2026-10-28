@@ -2,7 +2,7 @@ import type { PartGroup } from './i18n';
 import type { workflowEn } from './workflow-i18n';
 
 export const uiZh = {
-  product: 'Mesh Avatar Studio', subtitle: '让插画动起来，调整角色的动作范围',
+  product: '网格虚拟形象工作室', subtitle: '让插画动起来，调整角色的动作范围',
   tools: '项目操作', openProject: '打开项目', openRig: '仅加载 rig.json…', openFolder: '选择项目文件夹…',
   rigFile: '打开绑定配置文件', folderFiles: '打开项目文件夹内的文件', save: '保存绑定', undo: '撤销', redo: '重做',
   projectHelp: '项目是根据你的插画制作的文件夹，包含 rig.json（绑定配置）、source.png（原图）和 built/（生成图层）。',
@@ -16,7 +16,7 @@ export const uiZh = {
   drawnVariants: '含眼睛／嘴型差分', readOnly: '只读', copyPath: '复制路径', copyFolderPath: '复制文件夹路径', copied: '路径已复制',
   showFinder: '在访达中显示', showFolder: '打开文件夹', unknownPath: '通过浏览器选择的项目 · 无法获取完整路径',
   savedTo: '已保存到', saveError: '项目保存失败。编辑内容仍保留在页面中，请重试。', revealError: '无法打开项目文件夹。', copyError: '无法复制路径。',
-  help: '使用帮助', close: '关闭帮助', language: '界面语言', english: 'English', japanese: '日本語', chinese: '简体中文', enCode: 'EN', jaCode: 'JA', zhCode: '中文',
+  help: '使用帮助', close: '关闭帮助', language: '界面语言', english: '英语', japanese: '日语', chinese: '简体中文', enCode: '英语', jaCode: '日语', zhCode: '中文',
   parts: '部件', faceSection: '面部', hairSection: '头发与饰品', bodySection: '身体', advanced: '高级设置',
   notPresent: '当前绑定中没有此部件', show: '显示辅助线', hide: '隐藏辅助线', showAll: '全部显示', hideAll: '全部隐藏',
   source: '原图与绑定', canvas: '绑定编辑画布', fit: '适应画布', zoom: '缩放', zoomOut: '缩小', zoomIn: '放大', actualSize: '恢复到 100%', fitPart: '定位选中部件', wheelMode: '鼠标滚轮', wheelAuto: '缩放', wheelPan: '滚动平移',
@@ -50,7 +50,7 @@ export const uiZh = {
 };
 
 export const workflowZh: typeof workflowEn = {
-  agentInstruction: '在本项目文件夹中打开 AGENT，然后粘贴下面的请求。',
+  agentInstruction: '在本项目文件夹中打开 AGENT 编程助手，然后粘贴下面的请求。',
   variantsReloaded: '已加载表情差分。', mouthFallback: '尚无嘴型差分图片，正在使用网格变形。', drawMouth: '→ 制作嘴型差分',
   eyesKinds: '闭眼、半闭眼、笑眼', expressionKinds: '悲伤、惊讶的眼睛，生气、悲伤的嘴（可选）', mouthKinds: 'あ(a)、半张嘴あ(a)、い(i)、お(o)', variantCount: 'COUNT / TOTAL 张',
   askAgent: '请编程助手制作',

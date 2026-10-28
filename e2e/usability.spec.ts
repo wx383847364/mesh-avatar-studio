@@ -3,6 +3,48 @@ import { readFile } from 'node:fs/promises';
 import fixture from '../samples/miko-qipao/rig.json' with { type: 'json' };
 import { dismissGuide, samplePresent, sampleSkipReason } from './sample';
 
+// 验证升级后的首次访问使用中文，并且旧版英文缓存不会覆盖中文版默认值。
+test('Chinese interface is the default and stays selected across editor and live pages', async ({ page }) => {
+  test.skip(!samplePresent, sampleSkipReason);
+  // 模拟旧版已访问用户，同时移除新版语言偏好。
+  await page.addInitScript(() => {
+    localStorage.removeItem('mesh-avatar-studio-language');
+    localStorage.setItem('mesh-avatar-language', 'en');
+  });
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
+  await expect(page).toHaveTitle('网格虚拟形象工作室');
+  await page.getByRole('button', { name: '知道了', exact: true }).click();
+  await expect(page.getByTestId('preview-status')).toHaveAttribute('data-state', 'ready');
+  await page.getByTestId('part-eyes').click();
+  await expect(page.getByTestId('part-eyes')).toContainText('眼睛');
+  await page.getByRole('tab', { name: '嘴型测试', exact: true }).click();
+  await expect(page.getByTestId('audio-lip-settings')).toContainText('口型动作风格');
+  await page.getByRole('button', { name: '使用帮助', exact: true }).click();
+  await expect(page.getByRole('dialog')).toContainText('键盘与鼠标操作');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
+  await page.goto('/live.html?project=sample-miko-qipao');
+  await expect(page).toHaveTitle('网格虚拟形象工作室 · 直播');
+  await expect(page.getByRole('button', { name: '启动摄像头', exact: true })).toBeVisible();
+  await expect(page.locator('canvas[data-state="ready"]')).toBeVisible();
+  await page.getByRole('link', { name: '返回编辑器', exact: true }).click();
+  await expect(page).toHaveTitle('网格虚拟形象工作室');
+});
+
+// 语言切换是用户主动选择，英文和日文仍可使用并在刷新后保留。
+test('Chinese default can be switched to English and back without losing the preference', async ({ page }) => {
+  await page.goto('/');
+  await dismissGuide(page);
+  await page.getByRole('button', { name: '简体中文', exact: true }).click();
+  await expect(page.getByTestId('part-head')).toContainText('头部转动');
+  await page.reload();
+  await expect(page.getByTestId('part-head')).toContainText('头部转动');
+  await page.getByRole('button', { name: '英语', exact: true }).click();
+  await page.reload();
+  await expect(page.getByTestId('part-head')).toContainText('Head turn');
+});
+
 async function openEditor(page: Page) {
   await page.goto('/');
   await dismissGuide(page);
@@ -69,6 +111,7 @@ test('first-run guide appears once, is dismissible, and can be reopened from hel
   await page.getByRole('button', { name: 'Show the guide again' }).click();
   await expect(page.getByTestId('first-guide')).toBeVisible();
 });
+// 存储被禁用时仍以中文启动，并允许立即切换到日语继续编辑。
 test('blocked browser storage does not prevent editing or language changes', async ({ page }) => {
   test.skip(!samplePresent, sampleSkipReason);
   await page.addInitScript(() => {
@@ -78,7 +121,7 @@ test('blocked browser storage does not prevent editing or language changes', asy
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await openEditor(page);
-  await page.getByRole('button', { name: '日本語', exact: true }).click();
+  await page.getByRole('button', { name: '日语', exact: true }).click();
   await page.getByTestId('part-head').click();
   await expect(page.getByRole('spinbutton', { name: 'head.cx', exact: true })).toHaveValue('615');
   expect(errors).toEqual([]);

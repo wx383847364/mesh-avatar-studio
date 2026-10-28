@@ -63,11 +63,13 @@ test('paths stay hidden while copies keep full paths, folder buttons work and re
   await page.route('**/__studio/reveal', route => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
   await card.getByRole('button', { name: 'フォルダを開く', exact: true }).click(); await expect(card.getByRole('alert')).toBeVisible();
 });
+// 禁用存储后默认中文，主动切换英语再验证原有编程助手与滚轮操作。
 test('blocked preference storage still allows recipient and wheel mode changes', async ({ page }) => {
   test.skip(!samplePresent, sampleSkipReason);
   await page.addInitScript(() => { Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('Blocked', 'SecurityError'); } }); });
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await page.goto('/'); await dismissGuide(page);
+  await page.getByRole('button', { name: '英语', exact: true }).click();
   await page.getByTestId('variants-panel').getByRole('checkbox', { name: 'Mouth', exact: true }).check();
   await page.getByTestId('ask-agent-variants').getByRole('button', { name: 'Claude Code', exact: true }).click();
   await expect(page.getByTestId('ask-agent-variants').getByRole('textbox')).toContainText('Claude Code cannot generate images');

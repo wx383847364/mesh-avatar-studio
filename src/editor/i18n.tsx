@@ -5,7 +5,8 @@ import { uiZh, workflowZh, partsZh, fieldsZh } from './i18n-zh';
 export { readPreference, savePreference } from './preferences';
 
 export type Language = 'en' | 'ja' | 'zh';
-export const LANGUAGE_KEY = 'mesh-avatar-language';
+// 中文版使用独立偏好，首次打开不会继承旧版自动保存的英文默认值。
+export const LANGUAGE_KEY = 'mesh-avatar-studio-language';
 export const GUIDE_KEY = 'mesh-avatar-guide-seen';
 
 const en = {
@@ -175,13 +176,21 @@ export function fieldTitle(path: string, language: Language) {
     return language === 'zh' ? fieldsZh[key] ?? key : fieldText[key]?.[language === 'en' ? 0 : 1] ?? key;
   }).join(' · ');
 }
-const Context = createContext({ language: 'en' as Language, setLanguage: (_: Language) => { void _; } });
+// 未挂载提供器时也使用中文；占位回调不产生存储副作用。
+const Context = createContext({ language: 'zh' as Language, setLanguage: (_: Language) => { void _; } });
+/** 默认以简体中文启动，同时保留用户主动选择的其他语言。 */
 export function I18nProvider({ children }: { children: ReactNode }) {
+  // 只恢复有效语言，首次访问或损坏的偏好回落到中文。
   const [language, setLanguage] = useState<Language>(() => {
     const saved = readPreference(LANGUAGE_KEY);
-    return saved === 'ja' || saved === 'zh' ? saved : 'en';
+    return saved === 'en' || saved === 'ja' ? saved : 'zh';
   });
-  useEffect(() => { document.documentElement.lang = language === 'zh' ? 'zh-CN' : language; savePreference(LANGUAGE_KEY, language); }, [language]);
+  // 同步页面语言、标签标题与偏好，切换后刷新仍保持用户选择。
+  useEffect(() => {
+    document.documentElement.lang = language === 'zh' ? 'zh-CN' : language;
+    document.title = dictionaries[language].product + (location.pathname.endsWith('/live.html') ? ` · ${{ en: 'Live', ja: 'ライブ', zh: '直播' }[language]}` : '');
+    savePreference(LANGUAGE_KEY, language);
+  }, [language]);
   return <Context.Provider value={{ language, setLanguage }}>{children}</Context.Provider>;
 }
 export function useI18n() {

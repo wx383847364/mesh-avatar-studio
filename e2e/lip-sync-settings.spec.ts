@@ -83,6 +83,7 @@ test('presets preview immediately, fine-tuning becomes custom and user kana keep
   await expect(settings).toBeHidden();
 });
 
+// 验证编辑器设置导出后可在直播页与中文播放器继续使用。
 test('editor previews local audio, exports preferences, saves them and Live/Player load the saved settings', async ({ page, context }) => {
   test.skip(!samplePresent, sampleSkipReason);
   const errors: string[] = [], outside: string[] = [];
@@ -168,11 +169,11 @@ test('editor previews local audio, exports preferences, saves them and Live/Play
     await expect(page.locator('canvas[data-state="ready"]')).toBeVisible();
     const site = `http://127.0.0.1:${process.env.PLAYWRIGHT_SITE_PORT ?? 5174}/mesh-avatar-studio/play/`;
     await page.goto(site);
-    await expect(page.getByTestId('player-status')).toContainText('Avatar ready');
+    await expect(page.getByTestId('player-status')).toContainText('虚拟形象已就绪');
     await page.getByTestId('player-file').setInputFiles({ name: 'settings.mavatar', mimeType: 'application/octet-stream', buffer: bytes });
-    await expect(page.getByTestId('player-status')).toHaveText('Avatar ready · settings.mavatar');
-    await page.getByRole('combobox', { name: 'Framing', exact: true }).selectOption('cover');
-    await expect(page.getByTestId('player-status')).toHaveText('Avatar ready · settings.mavatar');
+    await expect(page.getByTestId('player-status')).toHaveText('虚拟形象已就绪 · settings.mavatar');
+    await page.getByRole('combobox', { name: '画面适配', exact: true }).selectOption('cover');
+    await expect(page.getByTestId('player-status')).toHaveText('虚拟形象已就绪 · settings.mavatar');
     expect(outside).toEqual([]); expect(errors).toEqual([]);
   } finally { if (name) await rm(resolve('projects', name), { recursive: true, force: true }); }
 });

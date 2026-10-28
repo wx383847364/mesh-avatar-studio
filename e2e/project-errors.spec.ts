@@ -7,9 +7,11 @@ const messages = {
 };
 
 for (const language of ['en', 'ja', 'zh'] as const) {
+  // 在指定语言下验证不可读项目的提示与禁用状态。
   test(`unreadable projects remain visible and disabled in the list and history (${language})`, async ({ page }, testInfo) => {
+    // 在导航前设置测试语言，避免默认中文影响多语言错误验证。
     await page.addInitScript(language => {
-      localStorage.setItem('mesh-avatar-language', language);
+      localStorage.setItem('mesh-avatar-studio-language', language);
       localStorage.setItem('mesh-avatar-guide-seen', '1');
       localStorage.setItem('mesh-avatar-recent-projects', JSON.stringify([{ id: 'server:locked-project', name: 'locked-project', serverName: 'locked-project', relativePath: 'projects/locked-project', kind: 'server', lastOpened: '2026-01-01T00:00:00Z' }]));
     }, language);
@@ -41,9 +43,11 @@ for (const language of ['en', 'ja', 'zh'] as const) {
     }
   });
 
+  // 在指定语言下区分缺少文件和权限错误。
   test(`folder picker distinguishes missing files from unreadable files (${language})`, async ({ page }, testInfo) => {
+    // 在导航前设置测试语言，避免默认中文影响多语言错误验证。
     await page.addInitScript(language => {
-      localStorage.setItem('mesh-avatar-language', language);
+      localStorage.setItem('mesh-avatar-studio-language', language);
       localStorage.setItem('mesh-avatar-guide-seen', '1');
       let attempt = 0;
       Object.defineProperty(window, 'showDirectoryPicker', { value: async () => {

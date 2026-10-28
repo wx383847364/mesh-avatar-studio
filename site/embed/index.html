@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://shinshin86.github.io blob: data: ws://127.0.0.1:* ws://localhost:*; img-src 'self' blob: data:; media-src 'self' blob:; object-src 'none'; base-uri 'self'">
-    <meta name="description" content="Try expressions, text lip sync and your own avatar files. Without src, the element loads Miko from https://shinshin86.github.io/mesh-avatar-studio/miko.mavatar.">
-    <title>Mesh Avatar — Try the HTML embed</title>
+    <meta http-equiv="Content-Security-Policy" content="connect-src &#x27;self&#x27; https://shinshin86.github.io blob: data: ws://127.0.0.1:* ws://localhost:*; img-src &#x27;self&#x27; blob: data:; media-src &#x27;self&#x27; blob:; object-src &#x27;none&#x27;; base-uri &#x27;self&#x27;">
+    <meta name="description" content="试用表情、文本嘴型同步和你自己的虚拟形象文件。未设置 src 时，组件会从 https://shinshin86.github.io/mesh-avatar-studio/miko.mavatar 加载米可。">
+    <title>网格虚拟形象 — HTML 嵌入演示</title>
     <link rel="canonical" href="https://shinshin86.github.io/mesh-avatar-studio/embed/">
-    <link rel="alternate" hreflang="en" href="https://shinshin86.github.io/mesh-avatar-studio/embed/">
+    <link rel="alternate" hreflang="zh-CN" href="https://shinshin86.github.io/mesh-avatar-studio/embed/">
     <link rel="alternate" hreflang="ja" href="https://shinshin86.github.io/mesh-avatar-studio/ja/embed/">
     <link rel="alternate" hreflang="x-default" href="https://shinshin86.github.io/mesh-avatar-studio/embed/">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -16,52 +16,52 @@
   </head>
   <body class="embed-page">
     <header class="site-header shell">
-      <a class="brand" href="../">Mesh Avatar Studio</a>
-      <nav class="primary-nav" aria-label="Navigation">
-        <a class="header-link" href="../">Home</a>
-        <a class="header-link language-switch" href="../ja/embed/" lang="ja">日本語</a>
+      <a class="brand" href="../">网格虚拟形象工作室</a>
+      <nav class="primary-nav" aria-label="导航">
+        <a class="header-link" href="../">首页</a>
+        <a class="header-link language-switch" href="../ja/embed/" lang="ja">日语</a>
       </nav>
     </header>
-    <main id="embed-playground" class="shell" data-loading="Loading avatar…" data-ready="Avatar ready" data-error="Could not load this avatar. Choose another file or return to Miko." data-copy-error="Select and copy the code above.">
+    <main id="embed-playground" class="shell" data-loading="正在加载虚拟形象…" data-ready="虚拟形象已就绪" data-error="无法加载此虚拟形象，请选择其他文件或恢复米可示例。" data-copy-error="请选中并复制上方代码。">
       <section class="intro" aria-labelledby="embed-title">
         <p class="eyebrow">mesh-avatar-element</p>
-        <h1 id="embed-title">Try the HTML embed</h1>
-        <p>Try expressions, text lip sync and your own avatar files. Without src, the element loads Miko from https://shinshin86.github.io/mesh-avatar-studio/miko.mavatar.</p>
+        <h1 id="embed-title">试用 HTML 嵌入</h1>
+        <p>试用表情、文本嘴型同步和你自己的虚拟形象文件。未设置 src 时，组件会从 https://shinshin86.github.io/mesh-avatar-studio/miko.mavatar 加载米可。</p>
         <div class="code-card">
           <div class="code-heading">
-            <h2>Embed on your page <span>HTML</span></h2>
-            <button id="copy-snippet" type="button" class="copy-button" data-copied="Copied">Copy</button>
+            <h2>嵌入你的页面 <span>HTML</span></h2>
+            <button id="copy-snippet" type="button" class="copy-button" data-copied="已复制">复制</button>
           </div>
           <pre tabindex="0"><code id="embed-code">&lt;script type="module" src="https://cdn.jsdelivr.net/npm/mesh-avatar-element@0/dist/standalone.js"&gt;&lt;/script&gt;
 &lt;mesh-avatar&gt;&lt;/mesh-avatar&gt;</code></pre>
         </div>
-        <a class="text-link" href="https://github.com/shinshin86/mesh-avatar-studio/tree/main/packages/element">Read the package guide ↗</a>
+        <a class="text-link" href="https://github.com/shinshin86/mesh-avatar-studio/tree/main/packages/element">查看组件使用指南 ↗</a>
       </section>
       <div class="embed-layout">
-        <section class="embed-stage" aria-label="Avatar preview">
+        <section class="embed-stage" aria-label="虚拟形象预览">
           <mesh-avatar></mesh-avatar>
-          <p id="source-name">Miko</p>
-          <p id="status" role="status" data-state="loading">Loading avatar…</p>
+          <p id="source-name">米可</p>
+          <p id="status" role="status" data-state="loading">正在加载虚拟形象…</p>
         </section>
         <div class="embed-panels">
           <fieldset id="avatar-controls" disabled>
-            <legend class="sr-only">Avatar controls</legend>
+            <legend class="sr-only">虚拟形象控制</legend>
             <section class="control-panel">
               <div class="embed-demo-controls">
-                <h2>Expressions</h2>
-              <div class="expression-chips" role="group" aria-label="Expressions">
-                <button type="button" data-expression="neutral" aria-pressed="true">Neutral</button>
-                <button type="button" data-expression="smile" aria-pressed="false">Smile</button>
-                <button type="button" data-expression="shy" aria-pressed="false">Shy</button>
-                <button type="button" data-expression="surprise" aria-pressed="false">Surprise</button>
-                <button type="button" data-expression="halfLidded" aria-pressed="false">Half-lidded</button>
-                <button type="button" data-expression="angry" aria-pressed="false">Angry</button>
-                <button type="button" data-expression="sad" aria-pressed="false">Sad</button>
-                <button type="button" data-expression="wink" aria-pressed="false">Wink</button>
+                <h2>表情</h2>
+              <div class="expression-chips" role="group" aria-label="表情">
+                <button type="button" data-expression="neutral" aria-pressed="true">普通</button>
+                <button type="button" data-expression="smile" aria-pressed="false">微笑</button>
+                <button type="button" data-expression="shy" aria-pressed="false">害羞</button>
+                <button type="button" data-expression="surprise" aria-pressed="false">惊讶</button>
+                <button type="button" data-expression="halfLidded" aria-pressed="false">半眯眼</button>
+                <button type="button" data-expression="angry" aria-pressed="false">生气</button>
+                <button type="button" data-expression="sad" aria-pressed="false">难过</button>
+                <button type="button" data-expression="wink" aria-pressed="false">眨眼</button>
               </div>
               </div>
               <div class="code-card">
-                <div class="code-heading"><h3>HTML</h3><button type="button" class="copy-button" data-copy="expression-code" data-copied="Copied">Copy</button></div>
+                <div class="code-heading"><h3>HTML</h3><button type="button" class="copy-button" data-copy="expression-code" data-copied="已复制">复制</button></div>
                 <pre tabindex="0"><code id="expression-code">&lt;mesh-avatar&gt;&lt;/mesh-avatar&gt;</code></pre>
               </div>
             </section>
@@ -72,22 +72,22 @@
                 <p id="mouth-style-hint" class="hint"></p>
               </div>
               <div class="code-card">
-                <div class="code-heading"><h3>JavaScript</h3><button type="button" class="copy-button" data-copy="mouth-style-code" data-copied="Copied">Copy</button></div>
+                <div class="code-heading"><h3>JavaScript</h3><button type="button" class="copy-button" data-copy="mouth-style-code" data-copied="已复制">复制</button></div>
                 <pre tabindex="0"><code id="mouth-style-code"></code></pre>
               </div>
             </section>
             <section class="control-panel">
               <div class="embed-demo-controls">
-                <h2>Text lip sync</h2>
+                <h2>文本嘴型同步</h2>
                 <form id="speech-form">
-                  <label for="speech-text">Japanese text</label>
+                  <label for="speech-text">日语文本（仅支持日语假名）</label>
                   <input id="speech-text" type="text" value="こんにちは" maxlength="300">
-                  <button type="submit">Animate speech</button>
+                  <button type="submit">播放嘴型动作</button>
                 </form>
-                <p class="hint">Mouth animation only. No voice is generated.</p>
+                <p class="hint">仅播放嘴型动作，不生成语音。</p>
               </div>
               <div class="code-card">
-                <div class="code-heading"><h3>JavaScript</h3><button type="button" class="copy-button" data-copy="speech-code" data-copied="Copied">Copy</button></div>
+                <div class="code-heading"><h3>JavaScript</h3><button type="button" class="copy-button" data-copy="speech-code" data-copied="已复制">复制</button></div>
                 <pre tabindex="0"><code id="speech-code">const el = document.querySelector('mesh-avatar');
 el.speak('こんにちは');</code></pre>
               </div>
@@ -95,21 +95,21 @@ el.speak('こんにちは');</code></pre>
           </fieldset>
           <section class="control-panel">
             <div class="embed-demo-controls">
-              <h2>Use your own .mavatar</h2>
+              <h2>使用自己的 .mavatar 文件</h2>
               <div class="file-actions">
                 <input id="avatar-file" class="file-input" type="file" accept=".mavatar" aria-labelledby="avatar-file-label">
-                <label id="avatar-file-label" class="file-button" for="avatar-file">Choose a .mavatar file</label>
-                <button id="restore-miko" type="button">Return to Miko</button>
+                <label id="avatar-file-label" class="file-button" for="avatar-file">选择 .mavatar 文件</label>
+                <button id="restore-miko" type="button">恢复米可示例</button>
               </div>
-              <p id="selected-file" class="hint" aria-live="polite">Selected: Miko</p>
-              <p class="hint">Files are read in your browser and are not uploaded.</p>
+              <p id="selected-file" class="hint" aria-live="polite">已选择：米可</p>
+              <p class="hint">文件仅在浏览器中读取，不会上传。</p>
             </div>
             <div>
               <div class="code-card">
-                <div class="code-heading"><h3>HTML</h3><button type="button" class="copy-button" data-copy="file-code" data-copied="Copied">Copy</button></div>
+                <div class="code-heading"><h3>HTML</h3><button type="button" class="copy-button" data-copy="file-code" data-copied="已复制">复制</button></div>
                 <pre tabindex="0"><code id="file-code">&lt;mesh-avatar src="/path/to/your-avatar.mavatar"&gt;&lt;/mesh-avatar&gt;</code></pre>
               </div>
-              <p class="hint">Set src to the path or URL of the file hosted on your site.</p>
+              <p class="hint">将 src 设置为你的网站上该文件的路径或网址。</p>
             </div>
           </section>
           <p id="notice" role="status"></p>
@@ -117,7 +117,7 @@ el.speak('こんにちは');</code></pre>
       </div>
     </main>
     <footer class="site-footer shell">
-      <p>Miko © Yuki Shindo (AITuber OnAir). <a href="https://miko.aituberonair.com/#terms">Miko character guidelines</a></p>
+      <p>米可 © Yuki Shindo（AITuber OnAir）。 <a href="https://miko.aituberonair.com/#terms">米可角色使用规范</a></p>
     </footer>
   </body>
 </html>

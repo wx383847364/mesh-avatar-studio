@@ -25,6 +25,7 @@ type Notice = 'loadError' | 'tooLarge' | null;
 interface DocumentPictureInPicture { requestWindow(options?: { width?: number; height?: number }): Promise<Window> }
 const pictureInPicture = () => (window as Window & { documentPictureInPicture?: DocumentPictureInPicture }).documentPictureInPicture;
 
+/** 在浏览器中播放形象，中文入口复用直播控制与播放器中文词典。 */
 export function PlayerApp({ language }: { language: PlayerLanguage }) {
   const t = { ...liveText[language], ...playerText[language] };
   const [source, setSource] = useState<Source>({ kind: 'sample' });
@@ -152,13 +153,15 @@ export function PlayerApp({ language }: { language: PlayerLanguage }) {
     popup.document.body.style.background = background === 'transparent' ? '#ffffff' : background;
   }, [popup, background]);
 
+  // 独立窗口沿用当前页面语言，避免中文界面弹出英文标题。
   const openPopup = async () => {
     const pip = pictureInPicture();
     if (!pip || popup) return;
     const rect = canvas.getBoundingClientRect();
     const size = Math.round(Math.min(720, Math.max(360, rect.height)));
     const win = await pip.requestWindow({ width: size, height: size });
-    win.document.title = 'Mesh Avatar';
+    win.document.title = language === 'zh' ? '网格虚拟形象' : 'Mesh Avatar';
+    win.document.documentElement.lang = language === 'zh' ? 'zh-CN' : language;
     const style = win.document.createElement('style');
     style.textContent = 'html, body { margin: 0; height: 100%; overflow: hidden; } .player-canvas { display: block; width: 100vw; height: 100vh; }';
     win.document.head.append(style);
@@ -192,8 +195,8 @@ export function PlayerApp({ language }: { language: PlayerLanguage }) {
   const stageBackground = { backgroundColor: background, backgroundImage: background === 'transparent' ? undefined : 'none' };
 
   return <main className={`live-app player-app${fullWindow ? ' player-full' : ''}`} onDragEnter={onDrag} onDragOver={onDrag} onDragLeave={onDrag} onDrop={onDrop}>
-    <header className="live-header"><div><a href="../" aria-label={t.home}>Mesh Avatar Studio</a><h1>Mesh Avatar <span>{t.title}</span></h1></div>
-      <a className="player-language" href={otherLanguage} lang={language === 'ja' ? 'en' : 'ja'}>{t.otherLanguage}</a>
+    <header className="live-header"><div><a href="../" aria-label={t.home}>{language === 'zh' ? '网格虚拟形象工作室' : 'Mesh Avatar Studio'}</a><h1>{language === 'zh' ? '网格虚拟形象' : 'Mesh Avatar'} <span>{t.title}</span></h1></div>
+      <a className="player-language" href={otherLanguage} lang={language === 'ja' ? 'zh-CN' : 'ja'}>{t.otherLanguage}</a>
     </header>
     <p className="player-intro">{t.intro}</p>
     <div className="live-layout"><section className="live-view">
@@ -257,7 +260,7 @@ export function PlayerApp({ language }: { language: PlayerLanguage }) {
         </div><small>{t.expressionHint}</small></div>
       </details>
       <details className="live-lighting" data-testid="lighting-section" onToggle={event => setLightingOpen(event.currentTarget.open)}>
-        <summary><Icon name="light" />{lightingText[language].title}{lighting.enabled && <span className="lighting-on">ON</span>}</summary>
+        <summary><Icon name="light" />{lightingText[language].title}{lighting.enabled && <span className="lighting-on">{language === 'zh' ? '已开启' : 'ON'}</span>}</summary>
         <div className="lighting-presets"><h3>{t.presets}</h3>
           <div className="preset-slots" role="group" aria-label={t.presets}>
             {presets.map((value, i) => <div className="preset-slot" key={i}>

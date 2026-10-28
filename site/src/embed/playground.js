@@ -1,3 +1,4 @@
+/** 初始化嵌入演示，示例名称沿用页面语言且不改变运行时标识。 */
 export function setupPlayground(root, { sampleURL, messages }) {
   const el = root.querySelector('mesh-avatar');
   const mouthStyles = {
@@ -12,7 +13,8 @@ export function setupPlayground(root, { sampleURL, messages }) {
   const status = root.querySelector('#status');
   const sourceName = root.querySelector('#source-name');
   const selectedFile = root.querySelector('#selected-file');
-  const selectedPrefix = selectedFile.textContent.replace(/Miko$/, '');
+  const sampleName = sourceName.textContent;
+  const selectedPrefix = selectedFile.textContent.slice(0, -sampleName.length);
   const controls = root.querySelector('#avatar-controls');
   const notice = root.querySelector('#notice');
   const speechText = root.querySelector('#speech-text');
@@ -106,8 +108,9 @@ export function setupPlayground(root, { sampleURL, messages }) {
     void el.load(file).catch(() => {});
     fileInput.value = '';
   });
+  // 恢复示例时保持本地化名称，文件名和加载地址继续使用原值。
   root.querySelector('#restore-miko').addEventListener('click', () => {
-    loading('Miko');
+    loading(sampleName);
     updateCode('file-code', '<mesh-avatar></mesh-avatar>');
     // load() reloads even when the src attribute is already absent.
     void el.load(sampleURL).catch(() => {});

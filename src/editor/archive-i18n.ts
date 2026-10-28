@@ -28,7 +28,7 @@ const ja: typeof en = {
 };
 const zh: typeof en = {
   exportTitle: '导出 .mavatar', exportButton: '下载 .mavatar', saveExport: '保存并导出',
-  includeSource: '包含原图', sourceHelp: '如需日后在 Studio 中编辑，请包含原始插画。',
+  includeSource: '包含原图', sourceHelp: '如需日后在工作室中编辑，请包含原始插画。',
   savedHelp: '导出已保存的设置、图层和眼睛、嘴部的差分图像。',
   originalHelp: '导出原始文件，不包含在只读视图中的修改。',
   saveHelp: '先保存当前修改，再导出。',

@@ -13,9 +13,19 @@ import lipSyncImageJa from '../../docs/images/ja/03-lip-sync.png';
 import variantsImageJa from '../../docs/images/ja/05-variants.png';
 import liveImageJa from '../../docs/images/ja/07-live.png';
 import streamImageJa from '../../docs/images/ja/08-stream.png';
+import overviewImageZh from '../../docs/images/zh/01-overview.png';
+import handlesImageZh from '../../docs/images/zh/02-edit-handles.png';
+import lipSyncImageZh from '../../docs/images/zh/03-lip-sync.png';
+import variantsImageZh from '../../docs/images/zh/05-variants.png';
+import liveImageZh from '../../docs/images/zh/07-live.png';
+import streamImageZh from '../../docs/images/zh/08-stream.png';
 import './style.css';
 
 const screenshots: Record<string, string> = {
+  zh: {
+    overview: overviewImageZh, handles: handlesImageZh, lipSync: lipSyncImageZh,
+    variants: variantsImageZh, live: liveImageZh, stream: streamImageZh,
+  },
   en: {
     overview: overviewImage, handles: handlesImage, lipSync: lipSyncImage,
     variants: variantsImage, live: liveImage, stream: streamImage,

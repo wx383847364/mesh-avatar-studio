@@ -19,6 +19,7 @@ const sliders = [
 ] as const;
 type Vowel = 'a' | 'i' | 'u' | 'e' | 'o' | 'n';
 type Lip = { kind: 'hold'; vowel: Vowel } | { kind: 'text'; text: string; speed: number; loop: boolean; source: 'user' | 'sample' } | null;
+/** 显示绑定的实时动作与光照预览，操作标签随界面语言切换。 */
 export function Preview({ projectKey, rig, assets, lipSync, onLipSyncChange, hasMouthSprites, onDrawMouth }: { projectKey: string; rig: Rig; assets?: Record<string, string>; lipSync?: AudioSettings; onLipSyncChange(value: AudioSettings): void; hasMouthSprites: boolean; onDrawMouth?: () => void }) {
   const { t, language } = useI18n();
   const [lighting, setLighting] = useState(() => loadLighting(projectKey));
@@ -190,7 +191,7 @@ export function Preview({ projectKey, rig, assets, lipSync, onLipSyncChange, has
 
       </div>
       <details className="lighting-section" data-testid="lighting-section" onToggle={event => setLightingOpen(event.currentTarget.open)}>
-        <summary><Icon name="light" />{lightingText[language].title}{lighting.enabled && <span className="lighting-on">ON</span>}</summary>
+        <summary><Icon name="light" />{lightingText[language].title}{lighting.enabled && <span className="lighting-on">{language === 'zh' ? '已开启' : 'ON'}</span>}</summary>
         <LightingControls value={lighting} onChange={setLighting} language={language} />
       </details>
     </section>

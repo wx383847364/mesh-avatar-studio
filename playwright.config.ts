@@ -9,6 +9,8 @@ export default defineConfig({
   workers: 1,
   use: {
     baseURL,
+    // 既有业务回归显式使用英语；中文首次启动场景单独清除语言偏好验证。
+    storageState: { cookies: [], origins: [{ origin: baseURL, localStorage: [{ name: 'mesh-avatar-studio-language', value: 'en' }] }] },
     viewport: { width: 1440, height: 1000 },
   },
   webServer: [{

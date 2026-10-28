@@ -36,46 +36,48 @@ async function fakeTracking(page: Page) {
       return { faceLandmarks: [[]], facialTransformationMatrixes: [{ data: [c,0,-s,0,0,1,0,0,s,0,c,0,0,0,0,1] }], faceBlendshapes: [{ categories: [] }] };
     } }) };` }));
 }
-// Waits until the named avatar has finished loading, not just until it is the current source.
-const ready = (page: Page, name: string) => expect(page.getByTestId('player-status')).toHaveText(`Avatar ready · ${name}`);
+// 等待指定形象的中文就绪状态，避免仅切换名称就误判加载完成。
+const ready = (page: Page, name: string) => expect(page.getByTestId('player-status')).toHaveText(`虚拟形象已就绪 · ${name}`);
 
+// 验证中文播放器文案下原有的加载、追踪和窗口交互。
 test('player runs the sample with face tracking in the browser and makes no outside requests', async ({ context, page }) => {
   const outside = await guardNetwork(context);
   await fakeTracking(page);
   await page.goto(`${site}play/`);
-  await ready(page, 'Miko (sample)');
-  await expect(page.getByTestId('player-status')).toContainText('Avatar ready');
+  await ready(page, '米可（示例）');
+  await expect(page.getByTestId('player-status')).toContainText('虚拟形象已就绪');
   const canvas = page.getByTestId('player-avatar');
-  await page.getByRole('button', { name: 'Start camera' }).click();
+  await page.getByRole('button', { name: '启动摄像头' }).click();
   await expect(page.getByTestId('tracking-status')).toHaveAttribute('data-state', 'tracking');
   // While tracking, idle motion is off: the head follows the stubbed 24 degree turn, and
   // calibrating makes that turn the neutral pose.
   await page.waitForTimeout(1000);
   const turned = await canvas.screenshot();
-  await page.getByRole('button', { name: 'Calibrate' }).click();
-  await expect(page.getByText('Neutral pose saved')).toBeVisible();
+  await page.getByRole('button', { name: '校准' }).click();
+  await expect(page.getByText('已保存中立姿态')).toBeVisible();
   await page.waitForTimeout(1000);
   expect((await canvas.screenshot()).equals(turned)).toBe(false);
-  await page.getByRole('button', { name: 'Stop camera' }).click();
+  await page.getByRole('button', { name: '停止摄像头' }).click();
   await expect(page.getByTestId('tracking-status')).toHaveAttribute('data-state', 'stopped');
   expect(outside).toEqual([]);
 });
 
+// 验证中文播放器文案下原有的加载、追踪和窗口交互。
 test('player opens a dropped or chosen .mavatar and recovers from a broken file', async ({ page }) => {
   const messages: string[] = [];
   page.on('console', message => messages.push(`${message.type()}: ${message.text()}`));
   page.on('framenavigated', frame => { if (frame === page.mainFrame()) messages.push(`navigated: ${frame.url()}`); });
   await page.goto(`${site}play/`);
-  await ready(page, 'Miko (sample)');
+  await ready(page, '米可（示例）');
   const archive = await (await page.request.get(`${site}miko.mavatar`)).body();
   await page.getByTestId('player-file').setInputFiles({ name: 'mine.mavatar', mimeType: 'application/octet-stream', buffer: archive });
   await ready(page, 'mine.mavatar').catch(async error => {
     const notice = await page.getByTestId('player-notice').textContent().catch(() => null);
     throw new Error(`${error}\nNotice: ${notice}\nPage log:\n${messages.join('\n')}`);
   });
-  await expect(page.getByText('Miko © Yuki Shindo')).toHaveCount(0);
+  await expect(page.getByText('米可 © Yuki Shindo')).toHaveCount(0);
   await page.getByTestId('player-file').setInputFiles({ name: 'broken.mavatar', mimeType: 'application/octet-stream', buffer: Buffer.from('not an avatar') });
-  await expect(page.getByTestId('player-notice')).toContainText('Could not open this file');
+  await expect(page.getByTestId('player-notice')).toContainText('无法打开此文件');
   await ready(page, 'mine.mavatar');
   // Drop onto the page.
   const transfer = await page.evaluateHandle(bytes => {
@@ -83,10 +85,11 @@ test('player opens a dropped or chosen .mavatar and recovers from a broken file'
   }, [...archive]);
   await page.locator('main').dispatchEvent('drop', { dataTransfer: transfer });
   await ready(page, 'dropped.mavatar');
-  await page.getByRole('button', { name: 'Use the sample' }).click();
-  await ready(page, 'Miko (sample)');
+  await page.getByRole('button', { name: '使用示例' }).click();
+  await ready(page, '米可（示例）');
 });
 
+// 验证中文播放器文案下原有的加载、追踪和窗口交互。
 test('player opens a file chosen while the sample is still loading', async ({ page }) => {
   const archive = await (await page.request.get(`${site}miko.mavatar`)).body();
   // Hold the sample download so the chosen file always starts loading first.
@@ -94,7 +97,7 @@ test('player opens a file chosen while the sample is still loading', async ({ pa
   const held = new Promise<void>(resolve => { release = resolve; });
   await page.route('**/miko.mavatar', async route => { await held; await route.continue(); });
   await page.goto(`${site}play/`);
-  await expect(page.getByTestId('player-status')).toHaveText('Loading avatar… · Miko (sample)');
+  await expect(page.getByTestId('player-status')).toHaveText('正在加载虚拟形象… · 米可（示例）');
   await page.getByTestId('player-file').setInputFiles({ name: 'early.mavatar', mimeType: 'application/octet-stream', buffer: archive });
   await expect(page.getByTestId('player-status')).toHaveText(/· early\.mavatar$/);
   release();
@@ -102,15 +105,16 @@ test('player opens a file chosen while the sample is still loading', async ({ pa
   await expect(page.getByTestId('player-notice')).toHaveCount(0);
 });
 
+// 验证中文播放器文案下原有的加载、追踪和窗口交互。
 test('player shows only the avatar on an exact key colour for a window capture', async ({ page }) => {
   await page.goto(`${site}play/`);
-  await ready(page, 'Miko (sample)');
-  await page.getByLabel('Background').selectOption('#00ff00');
+  await ready(page, '米可（示例）');
+  await page.getByLabel('背景').selectOption('#00ff00');
   // Keys are ignored while a form control has focus.
   await page.getByTestId('player-status').click();
   await page.keyboard.press('2');
-  await expect(page.locator('.expression-on')).toHaveText('Smile');
-  await page.getByRole('button', { name: 'Avatar only in this window' }).click();
+  await expect(page.locator('.expression-on')).toHaveText('微笑');
+  await page.getByRole('button', { name: '此窗口仅显示虚拟形象' }).click();
   await expect(page.locator('.live-controls')).toBeHidden();
   await expect(page.getByTestId('player-exit-hint')).toBeHidden({ timeout: 5000 });
   const image = PNG.sync.read(await page.screenshot());
@@ -119,26 +123,28 @@ test('player shows only the avatar on an exact key colour for a window capture',
   await expect(page.locator('.live-controls')).toBeVisible();
 });
 
+// 验证中文播放器文案下原有的加载、追踪和窗口交互。
 test('player moves the avatar to its own window and back', async ({ page, context }) => {
   await page.goto(`${site}play/`);
-  await ready(page, 'Miko (sample)');
+  await ready(page, '米可（示例）');
   test.skip(!await page.evaluate(() => 'documentPictureInPicture' in window), 'Document Picture-in-Picture is unavailable');
   const opened = context.waitForEvent('page');
-  await page.getByRole('button', { name: 'Open avatar window' }).click();
+  await page.getByRole('button', { name: '打开虚拟形象窗口' }).click();
   const avatarWindow = await opened;
   await expect(avatarWindow.locator('canvas')).toHaveCount(1);
-  await expect(page.getByText('The avatar is shown in its own window.')).toBeVisible();
+  await expect(page.getByText('虚拟形象已在独立窗口中显示。')).toBeVisible();
   const first = await avatarWindow.screenshot();
   await page.keyboard.press('4');
   await expect.poll(async () => (await avatarWindow.screenshot()).equals(first)).toBe(false);
   await avatarWindow.close();
   await expect(page.locator('.player-stage canvas')).toHaveCount(1);
-  await expect(page.getByRole('button', { name: 'Open avatar window' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '打开虚拟形象窗口' })).toBeVisible();
 });
 
-test('Japanese player page uses Japanese text and links back to the English page', async ({ page }) => {
+// 验证日语入口返回链接正确标记中文默认页面。
+test('Japanese player page uses Japanese text and links back to the Chinese page', async ({ page }) => {
   await page.goto(`${site}ja/play/`);
   await expect(page.getByTestId('player-status')).toContainText('アバターの準備ができました');
-  await expect(page.getByRole('link', { name: 'English' })).toHaveAttribute('href', '../../play/');
+  await expect(page.getByRole('link', { name: '简体中文' })).toHaveAttribute('href', '../../play/');
   expect(await readFile(new URL('../site/ja/play/index.html', import.meta.url), 'utf8')).toContain('lang="ja"');
 });
